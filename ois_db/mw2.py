@@ -7,7 +7,7 @@ import openpyxl
 t1 = datetime.datetime.now()
 
 
-def ss_max_load(from_datetime_str, to_datetime_str, html_path, excel_path=r'ss_max_load_mw.xlsx'):
+def ss_max_load(from_datetime_str, to_datetime_str, html_path, excel_path=r'ss_max_load_mw.xlsx', max_thresh=350):
     transformer_33kv_max_query_str = f"""
     -- SET GLOBAL Innodb_buffer_pool_size = 5168709120;
     SELECT s.id AS ss_id, MW.date_time, sum(abs(MW.value)) as MW
@@ -78,7 +78,7 @@ def ss_max_load(from_datetime_str, to_datetime_str, html_path, excel_path=r'ss_m
 
     """Remove garbage max entry"""
     for i in ss_max_mw_df.index:
-        if ss_max_mw_df.loc[i, 'MW'] > 350:
+        if ss_max_mw_df.loc[i, 'MW'] > max_thresh:
             ss_max_mw_df.loc[i, 'MW'] = pd.NA
 
     ss_max_mw_df1 = ss_max_mw_df.dropna(how='any', axis=0)
@@ -120,5 +120,5 @@ def ss_max_load(from_datetime_str, to_datetime_str, html_path, excel_path=r'ss_m
     return ss_max_mw_df1
 
 
-df = ss_max_load(from_datetime_str='2022-4-1 00:00', to_datetime_str='2022-4-30 23:00',
+df = ss_max_load(from_datetime_str='2022-5-01 00:00', to_datetime_str='2022-5-31 23:00',
                  html_path='t.html', excel_path='max_mw.xlsx')
