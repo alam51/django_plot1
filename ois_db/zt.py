@@ -100,5 +100,5 @@ def ss_max_min_voltage(from_datetime_str, to_datetime_str, excel_path=r'ss_max_l
     return max_zt_df
 
 
-df = ss_max_min_voltage(from_datetime_str='2022-2-1 00:00', to_datetime_str='2022-4-30 23:00',
+df = ss_max_min_voltage(from_datetime_str='2022-3-1 00:00', to_datetime_str='2022-7-30 23:00',
                         excel_path='max_zt_mw.xlsx')
