@@ -7,7 +7,9 @@ import openpyxl
 t1 = datetime.datetime.now()
 
 
-def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.xlsx'):
+def ss_max_min_voltage(from_datetime_str, to_datetime_str,
+                       from_hour1, to_hour1, from_hour2, to_hour2,
+                       excel_path=r'ss_max_load_mw.xlsx'):
     max_zt_query_str = f"""
     SELECT zone.name AS 'zone' , T_zt.zt AS 'MAX Zone Total (MW)', T_zt.date_time FROM 
     (
@@ -26,7 +28,9 @@ def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.
     WHERE se.is_transformer_low = 1
     AND (tt.id = 1 OR tt.id = 6 OR tt.id = 7 OR tt.id = 8)
     AND t.is_auxiliary = 0
-    AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}'
+    AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}' 
+    AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
+    (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
     GROUP BY MW.date_time, s.zone
     ) AS T_tr
     LEFT JOIN 
@@ -42,6 +46,8 @@ def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.
     -- JOIN gmd ON gmd.id = s.gmd
     WHERE f.is_generation = 1
     AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}'
+    AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
+    (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
     GROUP BY MW.date_time, s.zone
     ) AS T_gen
     ON T_tr.zone = T_gen.zone AND T_tr.date_time = T_gen.date_time
@@ -68,6 +74,8 @@ def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.
     AND (tt.id = 1 OR tt.id = 6 OR tt.id = 7 OR tt.id = 8)
     AND t.is_auxiliary = 0
     AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}'
+    AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
+    (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
     GROUP BY MW.date_time, s.zone
     ) AS T_tr
     LEFT JOIN 
@@ -83,6 +91,8 @@ def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.
     -- JOIN gmd ON gmd.id = s.gmd
     WHERE f.is_generation = 1
     AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}'
+    AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
+    (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
     GROUP BY MW.date_time, s.zone
     ) AS T_gen
     ON T_tr.zone = T_gen.zone AND T_tr.date_time = T_gen.date_time
@@ -90,6 +100,8 @@ def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.
     
     ON T_zt.zone = T_zt_max.zone AND T_zt.zt = T_zt_max.zt_max
     JOIN zone ON zone.id = T_zt.zone
+    GROUP BY zone.id 
+    ORDER BY zone.id
     """
 
     max_zt_df = pd.read_sql_query(max_zt_query_str, CONNECTOR)
@@ -100,5 +112,10 @@ def zone_max_mw(from_datetime_str, to_datetime_str, excel_path=r'ss_max_load_mw.
     return max_zt_df
 
 
-df = zone_max_mw(from_datetime_str='2022-3-1 00:00', to_datetime_str='2022-7-30 23:00',
-                 excel_path='max_zt_mw.xlsx')
+df = ss_max_min_voltage(from_datetime_str='2022-7-1 00:00',
+                        to_datetime_str='2022-7-30 23:00',
+                        from_hour1=9,
+                        to_hour1=17,
+                        from_hour2=17,
+                        to_hour2=17,
+                        excel_path='max_zt_mw.xlsx')
