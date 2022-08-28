@@ -110,5 +110,5 @@ ORDER BY 1
     return max_min_kv_df
 
 
-df = max_ss_load_mw(from_datetime_str='2022-8-11 13:00', to_datetime_str='2022-8-11 13:00',
+df = max_ss_load_mw(from_datetime_str='2022-7-1 00:00', to_datetime_str='2022-7-31 23:00',
                     excel_path='max_ss_load_mvar.xlsx')
