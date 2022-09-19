@@ -7,7 +7,7 @@ import openpyxl
 t1 = datetime.datetime.now()
 
 
-def max_ss_load_mw(from_datetime_str, to_datetime_str, excel_path=r'max_ss_load_mw.xlsx', mw_thresh = 350,
+def max_ss_load_mw(from_datetime_str, to_datetime_str, excel_path, mw_thresh = 350,
                    from_hour1=None,
                    to_hour1=None, from_hour2=None, to_hour2=None):
     max_zt_query_str = f"""
@@ -20,7 +20,7 @@ FROM
 (
 SELECT s.id, MW.date_time, sum(MW.value) as tr_MW
 -- tt.voltage_level, se.is_transformer_low
-FROM mega_watt AS MW
+FROM mega_var AS MW
 JOIN substation_equipment AS se ON se.id = MW.sub_equip_id
 JOIN transformer AS t ON se.transformer_id = t.id
 JOIN transformer_type AS tt ON tt.id = t.type_id
@@ -38,7 +38,7 @@ LEFT JOIN
 -- SET GLOBAL Innodb_buffer_pool_size = 5168709120;
 SELECT MW.date_time, s.id, sum(MW.value) AS gen_MW
 -- f.is_generation, se.is_feeder
-FROM mega_watt AS MW
+FROM mega_var AS MW
 JOIN substation_equipment AS se ON se.id = MW.sub_equip_id
 JOIN feeder AS f ON se.feeder_id = f.id
 JOIN substation AS s ON se.substation_id = s.id
@@ -66,7 +66,7 @@ FROM
 (
 SELECT s.id, MW.date_time, sum(MW.value) as tr_MW
 -- tt.voltage_level, se.is_transformer_low
-FROM mega_watt AS MW
+FROM mega_var AS MW
 JOIN substation_equipment AS se ON se.id = MW.sub_equip_id
 JOIN transformer AS t ON se.transformer_id = t.id
 JOIN transformer_type AS tt ON tt.id = t.type_id
@@ -84,7 +84,7 @@ LEFT JOIN
 -- SET GLOBAL Innodb_buffer_pool_size = 5168709120;
 SELECT MW.date_time, s.id, sum(MW.value) AS gen_MW
 -- f.is_generation, se.is_feeder
-FROM mega_watt AS MW
+FROM mega_var AS MW
 JOIN substation_equipment AS se ON se.id = MW.sub_equip_id
 JOIN feeder AS f ON se.feeder_id = f.id
 JOIN substation AS s ON se.substation_id = s.id
@@ -113,5 +113,5 @@ ORDER BY 1
     return max_min_kv_df
 
 
-df = max_ss_load_mw(from_datetime_str='2022-7-01 00:00', to_datetime_str='2022-7-01 23:00',
-                    excel_path='max_ss_load_mw.xlsx')
+df = max_ss_load_mw(from_datetime_str='2022-8-11 13:00', to_datetime_str='2022-8-11 13:00',
+                    excel_path='max_ss_load_mvar.xlsx')
