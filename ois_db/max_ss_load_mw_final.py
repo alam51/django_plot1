@@ -7,9 +7,17 @@ import openpyxl
 t1 = datetime.datetime.now()
 
 
-def max_ss_load_mw(from_datetime_str, to_datetime_str, excel_path=r'max_ss_load_mw.xlsx', mw_thresh = 350,
+def max_ss_load_mw(from_datetime_str, to_datetime_str, excel_path=r'max_ss_load_mw.xlsx', mw_thresh=350,
                    from_hour1=None,
                    to_hour1=None, from_hour2=None, to_hour2=None):
+    if from_hour1:
+        between_hour_str = f'AND (HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1})'
+        if from_hour2:
+            between_hour_str = f'''AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) 
+                -- OR (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))'''
+    else:
+        between_hour_str = ''
+
     max_zt_query_str = f"""
 SELECT s.name, T_ss_MW1.* FROM 
 (
@@ -29,8 +37,7 @@ WHERE se.is_transformer_low = 1
 AND (tt.id = 1 OR tt.id = 6 OR tt.id = 7 OR tt.id = 8)
 AND t.is_auxiliary = 0
 AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}' 
--- AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
--- (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
+{between_hour_str}
 GROUP BY MW.date_time, s.id
 ) AS T_tr
 LEFT JOIN 
@@ -45,8 +52,7 @@ JOIN substation AS s ON se.substation_id = s.id
 
 WHERE f.is_generation = 1
 AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}' 
--- AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
--- (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
+{between_hour_str}
 GROUP BY MW.date_time, s.id
 ) AS T_gen
 ON T_tr.id = T_gen.id AND T_tr.date_time = T_gen.date_time
@@ -75,8 +81,7 @@ WHERE se.is_transformer_low = 1
 AND (tt.id = 1 OR tt.id = 6 OR tt.id = 7 OR tt.id = 8)
 AND t.is_auxiliary = 0
 AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}' 
--- AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
--- (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
+{between_hour_str}
 GROUP BY MW.date_time, s.id
 ) AS T_tr
 LEFT JOIN 
@@ -92,8 +97,7 @@ JOIN substation AS s ON se.substation_id = s.id
 -- JOIN gmd ON gmd.id = s.gmd
 WHERE f.is_generation = 1
 AND MW.date_time BETWEEN '{from_datetime_str}' AND '{to_datetime_str}' 
--- AND ((HOUR(MW.date_time) BETWEEN {from_hour1} AND {to_hour1}) OR
--- (HOUR(MW.date_time) BETWEEN {from_hour2} AND {to_hour2}))
+{between_hour_str}
 GROUP BY MW.date_time, s.id
 ) AS T_gen
 ON T_tr.id = T_gen.id AND T_tr.date_time = T_gen.date_time
@@ -113,5 +117,5 @@ ORDER BY 1
     return max_min_kv_df
 
 
-df = max_ss_load_mw(from_datetime_str='2022-7-01 00:00', to_datetime_str='2022-7-01 23:00',
+df = max_ss_load_mw(from_datetime_str='2022-8-1 00:00', to_datetime_str='2022-8-31 23:00',
                     excel_path='max_ss_load_mw.xlsx')
