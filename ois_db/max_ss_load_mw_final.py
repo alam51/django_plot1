@@ -19,7 +19,7 @@ def max_ss_load_mw(from_datetime_str, to_datetime_str, excel_path=r'max_ss_load_
         between_hour_str = ''
 
     max_zt_query_str = f"""
-SELECT s.name, T_ss_MW1.* FROM 
+SELECT z.id AS z_id, z.name AS z_name, s.name, T_ss_MW1.* FROM 
 (
 SELECT T_ss_MW.id, MAX(T_ss_MW.ss_MW) AS ss_MW FROM 
 (
@@ -106,16 +106,20 @@ ON T_tr.id = T_gen.id AND T_tr.date_time = T_gen.date_time
 ON T_ss_MW1.id = T_ss_MW_max.id AND T_ss_MW1.ss_MW = T_ss_MW_max.ss_MW
 
 JOIN substation AS s ON s.id = T_ss_MW1.id
+JOIN zone AS z ON z.id = s.zone
 GROUP BY s.id
-ORDER BY 1 
+ORDER BY 1, 3
 """
     max_min_kv_df = pd.read_sql_query(max_zt_query_str, CONNECTOR)
-    max_min_kv_df.to_excel(excel_path)
+    max_min_kv_df1 = max_min_kv_df.set_index('id')
+    # max_min_kv_df1.to_excel(excel_path)
     print(f'time elapsed = {datetime.datetime.now() - t1}')
-    print(f'Excel written in {excel_path}')
+    # print(f'Excel written in {excel_path}')
     """HTML Conversion"""
-    return max_min_kv_df
+    return max_min_kv_df1
 
 
-df = max_ss_load_mw(from_datetime_str='2022-8-1 00:00', to_datetime_str='2022-8-31 23:00',
-                    excel_path='max_ss_load_mw.xlsx')
+# df = max_ss_load_mw(from_datetime_str='2022-8-1 00:00', to_datetime_str='2022-8-8 23:00',
+#                     from_hour1=8, to_hour1=12,
+#                     excel_path='max_ss_load_mw.xlsx')
+a = 5
