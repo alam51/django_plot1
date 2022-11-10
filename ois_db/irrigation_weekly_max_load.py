@@ -4,7 +4,7 @@ from max_ss_load_mw_final import max_ss_load_mw
 # date_range.dr
 
 previous_df = pd.DataFrame()
-for month in range(1, 5):
+for month in range(2, 3):
     date_range = pd.date_range(start=f'2022-{month}-1', periods=5, freq='7D').tolist()
     date_range[4] = pd.to_datetime(f'2022-{month + 1}-1') - pd.to_timedelta('1min')
     for i, date in enumerate(date_range[:len(date_range)-1]):
@@ -56,7 +56,7 @@ for month in range(1, 5):
         if previous_df.empty:
             previous_df = df
         else:
-            previous_df.loc[:, f'month{month}_week{i}_max'] = df.loc[:, 'ss_MW']
+            previous_df.loc[:, f'month{month}_week{i+1}_max'] = df.loc[:, 'ss_MW']
             # previous_df.loc[:, f'month{month}_week{i}_max_time'] = df.loc[:, 'date_time']
 previous_df.to_excel('irrigation_peak.xlsx')
 
