@@ -18,6 +18,7 @@ df = pd.read_sql_query(query_str, CONNECTOR_LDD, index_col='date_time')
 # # a = pd.to_datetime(df['date_time'])
 df['date'] = df.index.date
 df['time'] = df.index.time
+df.to_excel('gen.xlsx')
 a = 4
 
 # date_range = pd.date_range(start=from_datetime, end=to_datetime, freq='1D')
@@ -31,5 +32,5 @@ a = 4
 #     current_df_processed.to_excel('gen.xlsx')
 
 df_processed = df.pivot(index=['date', 'grid_name', 'fuel_name'], columns=['time'], values=['gen_mw'])
-df_processed.to_excel('gen.xlsx')
+df_processed.to_excel('gen_daily_formatted.xlsx')
 v = 1

@@ -119,7 +119,8 @@ ORDER BY 1, 3
     return max_min_kv_df1
 
 
-# df = max_ss_load_mw(from_datetime_str='2022-8-1 00:00', to_datetime_str='2022-8-8 23:00',
-#                     from_hour1=8, to_hour1=12,
-#                     excel_path='max_ss_load_mw.xlsx')
+df = max_ss_load_mw(from_datetime_str='2022-8-1 00:00', to_datetime_str='2022-8-31 23:00',
+                    from_hour1=8, to_hour1=12,
+                    excel_path='max_ss_load_mw.xlsx')
+df.to_excel('max_ss_load_mw.xlsx')
 a = 5
